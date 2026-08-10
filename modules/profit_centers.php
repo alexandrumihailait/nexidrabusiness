@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $name = trim($_POST['name'] ?? '');
         $code = strtolower(preg_replace('/[^a-z0-9_]+/i', '_', trim($_POST['code'] ?? '')));
         $description = trim($_POST['description'] ?? '') ?: null;
-        $color = trim($_POST['color'] ?? '#6366f1');
+        $color = trim($_POST['color'] ?? '#0ea5e9');
         $icon = trim($_POST['icon'] ?? 'bi-briefcase');
         $budgetAmountRaw = trim($_POST['budget_amount'] ?? '');
         $budgetAmount = $budgetAmountRaw !== '' ? (float)str_replace(',', '.', $budgetAmountRaw) : null;
@@ -82,8 +82,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    header('Location: ' . cashflow_url('profit_centers'));
-    exit;
+    // FIXED: Smart JS redirect to avoid "headers already sent"
+    cashflow_redirect(cashflow_url('profit_centers'));
 }
 
 $stmt = $pdo->prepare("SELECT * FROM cf_profit_centers WHERE company_id = ? ORDER BY type = 'corporate' ASC, status = 'active' DESC, name ASC");
@@ -99,66 +99,72 @@ if ($editId) {
 }
 ?>
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h4 class="fw-bold mb-0"><i class="bi bi-diagram-3"></i> Centre de profit</h4>
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h3 class="fw-bold mb-1 text-white"><i class="bi bi-diagram-3 text-info me-2"></i> Centre de Profit</h3>
+    <p class="text-muted small mb-0">Structura diviziilor și setarea bugetelor</p>
+  </div>
 </div>
 
-<div class="cf-card p-3 mb-4">
-  <h6 class="fw-bold mb-3"><?= $editCenter ? 'Editează centrul de profit' : 'Adaugă centru de profit' ?></h6>
+<div class="cf-card p-4 mb-4">
+  <h5 class="fw-bold mb-4 text-white"><i class="bi <?= $editCenter ? 'bi-pencil-square text-warning' : 'bi-plus-circle-dotted text-primary' ?> me-2"></i> <?= $editCenter ? 'Editează Divizia' : 'Adaugă o nouă divizie' ?></h5>
   <form method="post" action="<?= cashflow_url('profit_centers') ?>" class="row g-3">
     <input type="hidden" name="csrf_token" value="<?= cashflow_e(cashflow_csrf_token()) ?>">
     <input type="hidden" name="do" value="save">
     <input type="hidden" name="id" value="<?= $editCenter ? (int)$editCenter['id'] : 0 ?>">
 
     <div class="col-md-4">
-      <label class="form-label small fw-bold">Nume</label>
-      <input type="text" name="name" class="form-control" required value="<?= cashflow_e($editCenter['name'] ?? '') ?>">
+      <label class="form-label small text-muted text-uppercase fw-semibold mb-1">Nume Centru</label>
+      <input type="text" name="name" class="form-control" required value="<?= cashflow_e($editCenter['name'] ?? '') ?>" placeholder="ex: Flota Cluj">
     </div>
     <div class="col-md-3">
-      <label class="form-label small fw-bold">Cod (unic)</label>
-      <input type="text" name="code" class="form-control" required value="<?= cashflow_e($editCenter['code'] ?? '') ?>" <?= $editCenter ? 'readonly' : '' ?>>
+      <label class="form-label small text-muted text-uppercase fw-semibold mb-1">Cod Unic</label>
+      <input type="text" name="code" class="form-control font-monospace" required value="<?= cashflow_e($editCenter['code'] ?? '') ?>" <?= $editCenter ? 'readonly' : '' ?> placeholder="cluj_1">
     </div>
-    <div class="col-md-2">
-      <label class="form-label small fw-bold">Culoare</label>
-      <input type="color" name="color" class="form-control form-control-color" value="<?= cashflow_e($editCenter['color'] ?? '#6366f1') ?>">
-    </div>
-    <div class="col-md-3">
-      <label class="form-label small fw-bold">Icon (bootstrap-icons)</label>
-      <input type="text" name="icon" class="form-control" value="<?= cashflow_e($editCenter['icon'] ?? 'bi-briefcase') ?>" placeholder="bi-truck">
-    </div>
-
+    
     <?php if (!$editCenter): ?>
-    <div class="col-md-4">
-      <label class="form-label small fw-bold">Tip activitate</label>
+    <div class="col-md-5">
+      <label class="form-label small text-muted text-uppercase fw-semibold mb-1">Tip Activitate</label>
       <select name="type" class="form-select">
         <option value="custom">General</option>
-        <option value="transport">Transport (curse, vehicule, șoferi)</option>
-        <option value="service">Service / Detailing / Colantări (lucrări)</option>
+        <option value="transport">Transport (Curse, Vehicule)</option>
+        <option value="service">Service (Detailing, Reparații)</option>
       </select>
-      <div class="form-text">Determină panoul de KPI specific afișat pe dashboard-ul acestui centru.</div>
     </div>
+    <?php else: ?>
+        <div class="col-md-5"></div>
     <?php endif; ?>
 
-    <div class="col-md-6">
-      <label class="form-label small fw-bold">Descriere</label>
-      <input type="text" name="description" class="form-control" value="<?= cashflow_e($editCenter['description'] ?? '') ?>">
+    <div class="col-md-2">
+      <label class="form-label small text-muted text-uppercase fw-semibold mb-1">Accent Culoare</label>
+      <input type="color" name="color" class="form-control form-control-color w-100 px-2 bg-dark" value="<?= cashflow_e($editCenter['color'] ?? '#0ea5e9') ?>" style="height: 42px;">
     </div>
     <div class="col-md-3">
-      <label class="form-label small fw-bold">Buget</label>
-      <input type="text" name="budget_amount" class="form-control" value="<?= $editCenter['budget_amount'] ?? '' ?>" placeholder="ex: 100000">
+      <label class="form-label small text-muted text-uppercase fw-semibold mb-1">Icon (clasa Bootstrap)</label>
+      <input type="text" name="icon" class="form-control" value="<?= cashflow_e($editCenter['icon'] ?? 'bi-briefcase') ?>">
+    </div>
+
+    <div class="col-md-7">
+      <label class="form-label small text-muted text-uppercase fw-semibold mb-1">Descriere (Opțional)</label>
+      <input type="text" name="description" class="form-control" value="<?= cashflow_e($editCenter['description'] ?? '') ?>" placeholder="Notițe despre divizie...">
+    </div>
+    
+    <div class="col-md-3">
+      <label class="form-label small text-muted text-uppercase fw-semibold mb-1">Țintă Buget</label>
+      <input type="text" name="budget_amount" class="form-control" value="<?= $editCenter['budget_amount'] ?? '' ?>" placeholder="0.00">
     </div>
     <div class="col-md-3">
-      <label class="form-label small fw-bold">Perioadă buget</label>
+      <label class="form-label small text-muted text-uppercase fw-semibold mb-1">Ciclu Buget</label>
       <select name="budget_period" class="form-select">
-        <option value="">-</option>
+        <option value="">- Nu se aplică -</option>
         <option value="monthly" <?= ($editCenter['budget_period'] ?? '') === 'monthly' ? 'selected' : '' ?>>Lunar</option>
         <option value="yearly" <?= ($editCenter['budget_period'] ?? '') === 'yearly' ? 'selected' : '' ?>>Anual</option>
       </select>
     </div>
 
-    <div class="col-12">
-      <button type="submit" class="btn btn-primary fw-bold"><?= $editCenter ? 'Salvează modificările' : 'Creează centrul' ?></button>
-      <?php if ($editCenter): ?><a href="<?= cashflow_url('profit_centers') ?>" class="btn btn-outline-secondary">Renunță</a><?php endif; ?>
+    <div class="col-12 mt-4">
+      <button type="submit" class="btn btn-primary fw-bold px-4"><?= $editCenter ? 'Salvează modificările' : 'Creează Divizia' ?></button>
+      <?php if ($editCenter): ?><a href="<?= cashflow_url('profit_centers') ?>" class="btn btn-light px-4 ms-2">Anulează editarea</a><?php endif; ?>
     </div>
   </form>
 </div>
@@ -166,44 +172,57 @@ if ($editId) {
 <div class="cf-card p-0 overflow-hidden">
   <div class="table-responsive">
     <table class="table table-hover align-middle mb-0">
-      <thead class="table-light small text-uppercase text-muted">
+      <thead class="table-light small text-uppercase fw-semibold" style="letter-spacing: 0.5px;">
         <tr>
-          <th class="ps-3">Centru</th>
-          <th>Cod</th>
-          <th>Buget</th>
-          <th>Status</th>
-          <th class="text-end pe-3">Acțiuni</th>
+          <th class="ps-4 py-3">Nume Centru</th>
+          <th class="py-3">Cod Intern</th>
+          <th class="py-3">Structură Buget</th>
+          <th class="py-3 text-center">Status</th>
+          <th class="text-end pe-4 py-3">Acțiuni</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody class="border-top-0">
         <?php foreach ($centers as $pc): ?>
           <tr>
-            <td class="ps-3">
-              <span class="cf-pc-dot" style="background: <?= cashflow_e($pc['color']) ?>; width:28px; height:28px; font-size:.85rem;">
-                <i class="bi <?= cashflow_e($pc['icon']) ?>"></i>
-              </span>
-              <strong><?= cashflow_e($pc['name']) ?></strong>
-              <?php $typeLabels = ['corporate' => 'general', 'transport' => 'transport', 'service' => 'service/detailing']; ?>
-              <?php if (isset($typeLabels[$pc['type']])): ?><span class="badge bg-secondary-subtle text-secondary border ms-1"><?= cashflow_e($typeLabels[$pc['type']]) ?></span><?php endif; ?>
+            <td class="ps-4 py-3">
+              <div class="d-flex align-items-center gap-3">
+                <div class="rounded-circle d-flex align-items-center justify-content-center text-white shadow-sm" style="background: <?= cashflow_e($pc['color']) ?>; width: 38px; height: 38px;">
+                  <i class="bi <?= cashflow_e($pc['icon']) ?>"></i>
+                </div>
+                <div>
+                  <strong class="text-white d-block"><?= cashflow_e($pc['name']) ?></strong>
+                  <?php $typeLabels = ['corporate' => 'General', 'transport' => 'Transport', 'service' => 'Service/Lucrări']; ?>
+                  <?php if (isset($typeLabels[$pc['type']])): ?>
+                    <span class="small text-info" style="font-size: 0.75rem;"><?= cashflow_e($typeLabels[$pc['type']]) ?></span>
+                  <?php endif; ?>
+                </div>
+              </div>
             </td>
-            <td class="small text-muted"><?= cashflow_e($pc['code']) ?></td>
-            <td class="small"><?= $pc['budget_amount'] ? cashflow_money((float)$pc['budget_amount']) . ' / ' . ($pc['budget_period'] === 'yearly' ? 'an' : 'lună') : '-' ?></td>
-            <td>
-              <?php if ($pc['status'] === 'active'): ?>
-                <span class="badge bg-success-subtle text-success border border-success">Activ</span>
+            <td class="py-3 font-monospace small text-muted"><?= cashflow_e($pc['code']) ?></td>
+            <td class="py-3 text-light">
+              <?php if($pc['budget_amount']): ?>
+                <span class="fw-bold"><?= cashflow_money((float)$pc['budget_amount']) ?></span> 
+                <span class="text-muted small">/ <?= $pc['budget_period'] === 'yearly' ? 'an' : 'lună' ?></span>
               <?php else: ?>
-                <span class="badge bg-secondary-subtle text-secondary border">Inactiv</span>
+                <span class="text-muted">-</span>
               <?php endif; ?>
             </td>
-            <td class="text-end pe-3">
-              <a href="<?= cashflow_url('profit_centers', ['edit' => $pc['id']]) ?>" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></a>
+            <td class="py-3 text-center">
+              <?php if ($pc['status'] === 'active'): ?>
+                 <span class="badge rounded-pill bg-success text-white px-3 py-1" style="background-color: rgba(16, 185, 129, 0.2) !important; color: #34d399 !important;">Activ</span>
+              <?php else: ?>
+                 <span class="badge rounded-pill bg-secondary text-white px-3 py-1" style="background-color: rgba(100, 116, 139, 0.2) !important; color: #94a3b8 !important;">Inactiv</span>
+              <?php endif; ?>
+            </td>
+            <td class="text-end pe-4 py-3">
+              <a href="<?= cashflow_url('profit_centers', ['edit' => $pc['id']]) ?>" class="btn btn-sm btn-dark border border-secondary text-light shadow-sm me-1"><i class="bi bi-pencil"></i></a>
               <?php if ($pc['type'] !== 'corporate'): ?>
                 <form method="post" action="<?= cashflow_url('profit_centers') ?>" class="d-inline">
                   <input type="hidden" name="csrf_token" value="<?= cashflow_e(cashflow_csrf_token()) ?>">
                   <input type="hidden" name="do" value="toggle_status">
                   <input type="hidden" name="id" value="<?= (int)$pc['id'] ?>">
-                  <button type="submit" class="btn btn-sm btn-outline-<?= $pc['status'] === 'active' ? 'danger' : 'success' ?>">
-                    <i class="bi bi-<?= $pc['status'] === 'active' ? 'pause' : 'play' ?>"></i>
+                  <button type="submit" class="btn btn-sm btn-dark border border-secondary text-<?= $pc['status'] === 'active' ? 'danger' : 'success' ?> shadow-sm">
+                    <i class="bi bi-<?= $pc['status'] === 'active' ? 'power' : 'arrow-counterclockwise' ?>"></i>
                   </button>
                 </form>
               <?php endif; ?>
@@ -214,4 +233,3 @@ if ($editId) {
     </table>
   </div>
 </div>
-<p class="text-muted small mt-2">Centrele nu pot fi șterse fizic dacă au tranzacții asociate — folosește dezactivarea (Activ/Inactiv).</p>

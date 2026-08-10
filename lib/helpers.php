@@ -51,3 +51,15 @@ function cashflow_oauth_redirect_uri(string $provider): string
 {
     return cashflow_base_url() . '/index.php?p=integrations_callback&provider=' . urlencode($provider);
 }
+
+/** Safe redirect to prevent "headers already sent" white screen of death */
+function cashflow_redirect(string $url): void
+{
+    if (!headers_sent()) {
+        header('Location: ' . $url);
+    } else {
+        echo '<script>window.location.href = "' . cashflow_e($url) . '";</script>';
+        echo '<noscript><meta http-equiv="refresh" content="0;url=' . cashflow_e($url) . '"></noscript>';
+    }
+    exit;
+}
