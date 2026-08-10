@@ -1,0 +1,522 @@
+/* ==========================================================================
+   Cashflow design system
+   Self-contained on top of Bootstrap 5 (self-hosted, see assets/vendor/).
+   No external fonts/CDNs -- uses a system font stack for reliability.
+   ========================================================================== */
+
+:root {
+  --cf-primary: #4f46e5;
+  --cf-primary-dark: #4338ca;
+  --cf-primary-light: #6366f1;
+  --cf-accent: #7c3aed;
+  --cf-success: #059669;
+  --cf-danger: #dc2626;
+  --cf-warning: #d97706;
+  --cf-ink: #0f172a;
+  --cf-muted: #64748b;
+  --cf-border: #e6e8f0;
+  --cf-surface: #ffffff;
+  --cf-bg: #f5f6fb;
+
+  --cf-radius-sm: 10px;
+  --cf-radius: 14px;
+  --cf-radius-lg: 20px;
+
+  --cf-shadow-sm: 0 1px 2px rgba(15, 23, 42, .06);
+  --cf-shadow: 0 4px 16px rgba(15, 23, 42, .06);
+  --cf-shadow-lg: 0 12px 32px rgba(15, 23, 42, .10);
+  --cf-shadow-primary: 0 8px 20px rgba(79, 70, 229, .25);
+
+  --cf-ease: cubic-bezier(.4, 0, .2, 1);
+  --cf-fast: .15s;
+  --cf-normal: .25s;
+
+  --bs-font-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", Arial, sans-serif;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #c7cbe0 transparent;
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #c7cbe0; border-radius: 10px; border: 2px solid transparent; background-clip: content-box; }
+::-webkit-scrollbar-thumb:hover { background: #a8adc9; background-clip: content-box; }
+
+html {
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--cf-bg);
+  overflow-x: hidden;
+  font-family: var(--bs-font-sans-serif);
+  color: var(--cf-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { transition: color var(--cf-fast) var(--cf-ease); }
+
+/* -------------------------------------------------------------------------
+   Motion: subtle, purposeful, and respectful of reduced-motion preference.
+   ------------------------------------------------------------------------- */
+
+@keyframes cf-fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cf-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes cf-pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(79, 70, 229, .35); }
+  100% { box-shadow: 0 0 0 8px rgba(79, 70, 229, 0); }
+}
+
+.cf-fade-in {
+  animation: cf-fade-up .45s var(--cf-ease) both;
+}
+
+.cf-stagger > * {
+  animation: cf-fade-up .45s var(--cf-ease) both;
+}
+
+.cf-stagger > *:nth-child(1) { animation-delay: .02s; }
+.cf-stagger > *:nth-child(2) { animation-delay: .06s; }
+.cf-stagger > *:nth-child(3) { animation-delay: .10s; }
+.cf-stagger > *:nth-child(4) { animation-delay: .14s; }
+.cf-stagger > *:nth-child(5) { animation-delay: .18s; }
+.cf-stagger > *:nth-child(6) { animation-delay: .22s; }
+.cf-stagger > *:nth-child(n+7) { animation-delay: .26s; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .cf-fade-in, .cf-stagger > * { animation: none; }
+  * { transition-duration: .001ms !important; animation-duration: .001ms !important; }
+}
+
+/* -------------------------------------------------------------------------
+   Buttons -- slightly more weight, a lift on hover, a press-down on click.
+   ------------------------------------------------------------------------- */
+
+.btn {
+  font-weight: 600;
+  border-radius: var(--cf-radius-sm);
+  transition: transform var(--cf-fast) var(--cf-ease), box-shadow var(--cf-fast) var(--cf-ease), background-color var(--cf-fast) var(--cf-ease), border-color var(--cf-fast) var(--cf-ease), color var(--cf-fast) var(--cf-ease);
+}
+
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--cf-primary), var(--cf-primary-light));
+  border-color: var(--cf-primary);
+  box-shadow: var(--cf-shadow-primary);
+}
+
+.btn-primary:hover, .btn-primary:focus {
+  background: linear-gradient(135deg, var(--cf-primary-dark), var(--cf-primary));
+  border-color: var(--cf-primary-dark);
+  box-shadow: 0 10px 24px rgba(79, 70, 229, .32);
+}
+
+.btn-outline-primary { border-width: 1.5px; }
+
+.btn:focus-visible, .form-control:focus-visible, .form-select:focus-visible, a:focus-visible {
+  outline: 2px solid var(--cf-primary-light);
+  outline-offset: 2px;
+}
+
+.form-control, .form-select {
+  border-radius: var(--cf-radius-sm);
+  border-color: var(--cf-border);
+  transition: border-color var(--cf-fast) var(--cf-ease), box-shadow var(--cf-fast) var(--cf-ease);
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--cf-primary-light);
+  box-shadow: 0 0 0 .2rem rgba(99, 102, 241, .15);
+}
+
+.dropdown-menu {
+  border: 1px solid var(--cf-border);
+  border-radius: var(--cf-radius-sm);
+  box-shadow: var(--cf-shadow-lg);
+  animation: cf-fade-up .18s var(--cf-ease) both;
+  padding: .4rem;
+}
+
+.dropdown-item {
+  border-radius: 8px;
+  padding: .5rem .75rem;
+  transition: background-color var(--cf-fast) var(--cf-ease);
+}
+
+.dropdown-item.active, .dropdown-item:active {
+  background: var(--cf-primary);
+}
+
+.badge { font-weight: 600; letter-spacing: .01em; }
+
+/* -------------------------------------------------------------------------
+   Top navbar (company app)
+   ------------------------------------------------------------------------- */
+
+.cf-topbar {
+  background: rgba(255, 255, 255, .92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--cf-border);
+  box-shadow: 0 1px 0 rgba(15, 23, 42, .03);
+  z-index: 1030;
+}
+
+.cf-topbar .navbar-brand {
+  color: var(--cf-ink);
+  font-size: 1.15rem;
+}
+
+.cf-topbar .navbar-brand i {
+  color: var(--cf-primary);
+}
+
+.cf-topbar .nav-link {
+  font-weight: 600;
+  color: var(--cf-muted);
+  border-radius: var(--cf-radius-sm);
+  padding: .5rem .85rem;
+  transition: background-color var(--cf-fast) var(--cf-ease), color var(--cf-fast) var(--cf-ease);
+}
+
+.cf-topbar .nav-link:hover {
+  color: var(--cf-primary);
+  background: rgba(79, 70, 229, .07);
+}
+
+.cf-topbar .nav-link.active {
+  color: var(--cf-primary);
+  background: rgba(79, 70, 229, .1);
+}
+
+.navbar-toggler {
+  border-radius: var(--cf-radius-sm);
+  border-color: var(--cf-border) !important;
+}
+
+.navbar-toggler:focus { box-shadow: 0 0 0 .2rem rgba(99, 102, 241, .2); }
+
+.cf-context-selectors {
+  min-width: 0;
+}
+
+.cf-selector-btn {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  border: 1px solid var(--cf-border);
+  background: var(--cf-bg);
+  text-align: left;
+  width: 100%;
+  max-width: 100%;
+  padding: .4rem .75rem;
+  transition: border-color var(--cf-fast) var(--cf-ease), box-shadow var(--cf-fast) var(--cf-ease), background-color var(--cf-fast) var(--cf-ease);
+}
+
+.cf-selector-btn:hover {
+  border-color: var(--cf-primary-light);
+  background: #fff;
+  box-shadow: var(--cf-shadow-sm);
+}
+
+@media (min-width: 1200px) {
+  .cf-selector-btn { width: auto; max-width: 230px; }
+}
+
+.cf-selector-label {
+  line-height: 1.15;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.cf-selector-label strong,
+.cf-selector-label small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cf-company-logo {
+  height: 22px;
+  width: 22px;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+/* -------------------------------------------------------------------------
+   Cards, KPI tiles, profit-center cards
+   ------------------------------------------------------------------------- */
+
+.cf-card {
+  background: var(--cf-surface);
+  border: 1px solid var(--cf-border);
+  border-radius: var(--cf-radius);
+  box-shadow: var(--cf-shadow-sm);
+  transition: box-shadow var(--cf-normal) var(--cf-ease), transform var(--cf-normal) var(--cf-ease);
+}
+
+.cf-kpi {
+  position: relative;
+  border-radius: var(--cf-radius);
+  padding: 1.15rem 1.3rem;
+  color: #fff;
+  overflow: hidden;
+  box-shadow: var(--cf-shadow);
+  transition: transform var(--cf-normal) var(--cf-ease), box-shadow var(--cf-normal) var(--cf-ease);
+}
+
+.cf-kpi::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120px 80px at 90% -10%, rgba(255, 255, 255, .28), transparent 70%);
+  pointer-events: none;
+}
+
+.cf-kpi:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--cf-shadow-lg);
+}
+
+.cf-kpi .cf-kpi-label {
+  font-size: .74rem;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  opacity: .88;
+  font-weight: 700;
+}
+
+.cf-kpi .cf-kpi-value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -.01em;
+}
+
+.cf-kpi-cash { background: linear-gradient(135deg, #4f46e5, #7c3aed); }
+.cf-kpi-in { background: linear-gradient(135deg, #059669, #10b981); }
+.cf-kpi-out { background: linear-gradient(135deg, #dc2626, #f97316); }
+.cf-kpi-net { background: linear-gradient(135deg, #0f172a, #334155); }
+
+.cf-pc-card {
+  border-radius: var(--cf-radius);
+  border: 1px solid var(--cf-border);
+  background: var(--cf-surface);
+  padding: 1.1rem 1.2rem;
+  height: 100%;
+  box-shadow: var(--cf-shadow-sm);
+  transition: transform var(--cf-normal) var(--cf-ease), box-shadow var(--cf-normal) var(--cf-ease), border-color var(--cf-normal) var(--cf-ease);
+}
+
+a:has(> .cf-pc-card) { text-decoration: none; }
+
+.cf-pc-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--cf-shadow-lg);
+  border-color: var(--cf-primary-light);
+}
+
+.cf-pc-dot {
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.05rem;
+  box-shadow: var(--cf-shadow-sm);
+}
+
+.cf-bar-track {
+  background: #eef0f8;
+  border-radius: 6px;
+  height: 10px;
+  overflow: hidden;
+}
+
+.cf-bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width .6s var(--cf-ease);
+}
+
+/* -------------------------------------------------------------------------
+   Tables
+   ------------------------------------------------------------------------- */
+
+.table {
+  --bs-table-hover-bg: rgba(79, 70, 229, .04);
+}
+
+.table thead th {
+  font-size: .72rem;
+  letter-spacing: .06em;
+  font-weight: 700;
+  border-bottom-width: 1px;
+  color: var(--cf-muted);
+}
+
+.table tbody tr {
+  transition: background-color var(--cf-fast) var(--cf-ease);
+}
+
+/* -------------------------------------------------------------------------
+   Auth shell (login / setup / select company)
+   ------------------------------------------------------------------------- */
+
+.cf-login-wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  background:
+    radial-gradient(600px 400px at 12% -10%, rgba(124, 58, 237, .14), transparent 60%),
+    radial-gradient(700px 500px at 110% 10%, rgba(79, 70, 229, .12), transparent 60%),
+    var(--cf-bg);
+}
+
+.cf-login-card {
+  width: 100%;
+  max-width: 400px;
+}
+
+.cf-login-wrap .cf-card {
+  box-shadow: var(--cf-shadow-lg);
+  border-color: rgba(79, 70, 229, .08);
+}
+
+.cf-brand-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--cf-primary), var(--cf-accent));
+  color: #fff;
+  font-size: 1.6rem;
+  box-shadow: var(--cf-shadow-primary);
+}
+
+.cf-company-pick {
+  display: block;
+  border-radius: var(--cf-radius);
+  border: 1px solid var(--cf-border);
+  background: var(--cf-surface);
+  padding: 1rem 1.2rem;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: var(--cf-shadow-sm);
+  transition: box-shadow var(--cf-normal) var(--cf-ease), border-color var(--cf-normal) var(--cf-ease), transform var(--cf-normal) var(--cf-ease);
+}
+
+.cf-company-pick:hover {
+  border-color: var(--cf-primary);
+  box-shadow: var(--cf-shadow-lg);
+  transform: translateY(-2px);
+}
+
+/* -------------------------------------------------------------------------
+   Platform admin theme -- dark, same component language, higher contrast.
+   ------------------------------------------------------------------------- */
+
+.cf-admin-body {
+  background: #0b1120;
+  background-image:
+    radial-gradient(900px 500px at 100% -10%, rgba(79, 70, 229, .18), transparent 60%),
+    radial-gradient(700px 400px at 0% 0%, rgba(124, 58, 237, .12), transparent 55%);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+.cf-admin-topbar {
+  background: rgba(17, 24, 39, .85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid #1f2937;
+}
+
+.cf-admin-topbar .nav-link {
+  color: #cbd5e1;
+  font-weight: 600;
+  border-radius: var(--cf-radius-sm);
+  transition: background-color var(--cf-fast) var(--cf-ease), color var(--cf-fast) var(--cf-ease);
+}
+
+.cf-admin-topbar .nav-link.active,
+.cf-admin-topbar .nav-link:hover {
+  color: #fff;
+  background: rgba(99, 102, 241, .18);
+}
+
+.cf-admin-topbar .navbar-brand {
+  color: #fff;
+}
+
+.cf-admin-topbar .navbar-brand i { color: var(--cf-primary-light); }
+
+.cf-admin-topbar .dropdown-menu {
+  background: #111827;
+  border-color: #1f2937;
+}
+
+.cf-admin-topbar .dropdown-item { color: #e2e8f0; }
+.cf-admin-topbar .dropdown-item:hover, .cf-admin-topbar .dropdown-item:focus { background: rgba(99, 102, 241, .18); color: #fff; }
+
+main.cf-admin-main {
+  background: var(--cf-bg);
+  min-height: calc(100vh - 64px);
+  border-radius: var(--cf-radius-lg) var(--cf-radius-lg) 0 0;
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, .25);
+}
+
+/* -------------------------------------------------------------------------
+   Misc utility polish
+   ------------------------------------------------------------------------- */
+
+.cf-empty-state {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  color: var(--cf-muted);
+}
+
+.cf-empty-state i {
+  font-size: 2.4rem;
+  opacity: .35;
+  display: block;
+  margin-bottom: .75rem;
+}
+
+.alert {
+  border-radius: var(--cf-radius-sm);
+  border: 1px solid transparent;
+  animation: cf-fade-up .3s var(--cf-ease) both;
+}
+
+.spinner-border-sm.cf-spin { animation-duration: .6s; }
+
+/* Long tables inside cards shouldn't force the page itself to scroll horizontally. */
+.table-responsive {
+  border-radius: 0 0 var(--cf-radius) var(--cf-radius);
+}
+
+@media (max-width: 575.98px) {
+  .cf-kpi-value { font-size: 1.35rem; }
+  h4.fw-bold { font-size: 1.25rem; }
+}

@@ -1,0 +1,12 @@
+# Only index.php, admin.php, and setup.php are meant to be requested
+# directly (setup.php disables itself once a platform admin exists).
+<FilesMatch "^(config|db)\.php$|\.sql$|^seed\.php$|composer\.(json|lock)$">
+    Require all denied
+</FilesMatch>
+
+# Never let the server hand out .env-style files if one is added later.
+<FilesMatch "^\.env">
+    Require all denied
+</FilesMatch>
+
+Options -Indexes

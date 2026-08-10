@@ -1,0 +1,4 @@
+# Defense in depth: documents are only ever served through the
+# authenticated modules/document_download.php gate, never directly.
+Require all denied
+Deny from all

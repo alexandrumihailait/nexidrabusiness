@@ -1,0 +1,5 @@
+# These files are only meant to be `require`d by index.php/admin.php,
+# which set up $pdo/$userId/access checks first. Direct access would hit
+# undefined-variable errors at best and skip every access check at worst.
+Require all denied
+Deny from all
